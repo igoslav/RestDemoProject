@@ -1,10 +1,14 @@
 package com.epam.xmcy.rest;
 
+import com.epam.xmcy.model.Cryptocurrency;
+import com.epam.xmcy.service.CsvService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Main controller to interact with cryptocurrencies data.
@@ -12,6 +16,9 @@ import java.time.LocalDate;
 @Controller
 @RequestMapping("/cryptocurrencies")
 public class Resource {
+
+    @Autowired
+    private CsvService csvService;
 
     /**
      * Method returns a descending sorted list of all the cryptos,
@@ -21,8 +28,8 @@ public class Resource {
      */
     @GetMapping
     @ResponseBody
-    public String getAllCryptos() {
-        return "Hello world!";
+    public List<Cryptocurrency> getAllCryptocurrencies() {
+        return csvService.getAllCryptocurrencies();
     }
 
     /**
@@ -36,10 +43,22 @@ public class Resource {
      */
     @GetMapping("/{crypto}")
     @ResponseBody
-    public String getCryptoStatistics(@PathVariable String crypto,
+    public Cryptocurrency getCryptoStatistics(@PathVariable String crypto,
                                       @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fromDate,
                                       @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate toDate) {
-        return "Hello world " + crypto;
+        if (crypto == null || "".equals(crypto)) {
+            throw new IllegalArgumentException("Please provide valid cryptocurrency short name.");
+        }
+
+        if (fromDate == null) {
+            fromDate = LocalDate.MIN;
+        }
+
+        if (toDate == null) {
+            toDate = LocalDate.now();
+        }
+
+        return csvService.getCryptocurrencyByName(crypto);
     }
 
     /**
@@ -51,7 +70,11 @@ public class Resource {
      */
     @GetMapping("/recommendation")
     @ResponseBody
-    public String getRecommendationByDate(@RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
-        return "Hello world " + date;
+    public List<Cryptocurrency> getRecommendationByDate(@RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
+        if (date == null) {
+            throw new IllegalArgumentException("Please provide date");
+        }
+
+        return csvService.getRecommendationByDate(date);
     }
 }
