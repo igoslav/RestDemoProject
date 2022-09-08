@@ -39,7 +39,12 @@ public class Resource {
     @GetMapping
     @ResponseBody
     public List<Cryptocurrency> getAllCryptocurrencies() {
-        return csvService.getAllCryptocurrencies();
+        List<Cryptocurrency> cryptocurrencies = csvService.getAllCryptocurrencies();
+        if (CollectionUtils.isEmpty(cryptocurrencies)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "List of cryptocurrencies not found.");
+        }
+
+        return cryptocurrencies;
     }
 
     /**

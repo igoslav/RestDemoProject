@@ -4,6 +4,8 @@ import com.epam.xmcy.model.CryptoValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,11 +16,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,9 +61,11 @@ public class CSVCryptoDataStrategy implements CryptoDataStrategy {
         for (String fileName : cryptoCsvFiles) {
             List<CryptoValue> stats = readCsvDataFromFile(fileName);
 
-            // Get crypto short name from the file name.
-            String symbol = fileName.replaceAll("_values\\.csv", "");
-            all.put(symbol, stats);
+            if (!CollectionUtils.isEmpty(stats)) {
+                // Get crypto short name from the file name.
+                String symbol = fileName.replaceAll("_values\\.csv", "");
+                all.put(symbol, stats);
+            }
         }
 
         return all;
@@ -81,6 +81,9 @@ public class CSVCryptoDataStrategy implements CryptoDataStrategy {
         List<CryptoValue> records = new LinkedList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(pathToCsvDir + fileName))) {
             String line = br.readLine();
+            if (line == null || "".equals(line)) {
+                return Collections.emptyList();
+            }
 
             // Read first line which contains headers.
             String[] headers = line.split(",");

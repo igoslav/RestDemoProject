@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -85,8 +86,10 @@ public class CsvServiceImpl implements CsvService {
     public void refreshData() {
         Map<String, List<CryptoValue>> allData = readAll();
 
-        cryptoService.refreshCommonCryptoStats(allData);
-        cryptoService.refreshCryptoStatsForDays(allData);
+        if (!CollectionUtils.isEmpty(allData)) {
+            cryptoService.refreshCommonCryptoStats(allData);
+            cryptoService.refreshCryptoStatsForDays(allData);
+        }
     }
 
     /**
