@@ -68,9 +68,9 @@ public class ResourceTest {
     @Test
     void getRecommendationByDate() {
         Cryptocurrency cryptocurrency = createTestCrypto();
-        when(csvService.getRecommendationByDate(NEWEST_VALUE.toLocalDate()))
+        when(csvService.getRecommendationByDate(NEWEST_VALUE.toLocalDate(), OLDEST_VALUE.toLocalDate()))
                 .thenReturn(Collections.singletonList(cryptocurrency));
-        List<Cryptocurrency> result = resource.getRecommendationByDate(NEWEST_VALUE.toLocalDate());
+        List<Cryptocurrency> result = resource.getRecommendationByDate(NEWEST_VALUE.toLocalDate(), OLDEST_VALUE.toLocalDate());
 
         assertFalse(CollectionUtils.isEmpty(result));
         assertTrue(result.size() > 0);

@@ -1,5 +1,6 @@
 package com.epam.xmcy.rest;
 
+import com.epam.xmcy.exception.BusinessServiceException;
 import com.epam.xmcy.model.Cryptocurrency;
 import com.epam.xmcy.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,26 +64,38 @@ public class Resource {
             toDate = LocalDate.now();
         }
 
-        return csvService.getCryptocurrencyByName(crypto);
+        Cryptocurrency cryptocurrency = csvService.getCryptocurrencyByName(crypto);
+        if (cryptocurrency == null) {
+            throw new BusinessServiceException("Cryptocurrency not found or not supported yet.");
+        }
+
+        return cryptocurrency;
     }
 
     /**
      * Method returns cryptocurrency with the highest normalized range for a specific date.
      *
-     * @param date date to check, format dd-MM-yyyy.
+     * @param fromDate start date to check, format dd-MM-yyyy.
+     * @param toDate end date to check, format dd-MM-yyyy.
      * @return cryptocurrency object.
      */
     @GetMapping("/recommendation")
     @ResponseBody
     public List<Cryptocurrency> getRecommendationByDate(@RequestParam(required = false)
-                                                @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
-        if (date == null) {
-            date = LocalDate.now();
+                                                        @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fromDate,
+                                                        @RequestParam(required = false)
+                                                        @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate toDate) {
+        if (fromDate == null) {
+            fromDate = LocalDate.now();
+        }
+
+        if (toDate == null) {
+            toDate = fromDate;
         }
 
         // Actually, we need to return only 1 crypto,
         // but this endpoint returns list of all cryptos sorted by normalized range
-        return csvService.getRecommendationByDate(date);
+        return csvService.getRecommendationByDate(fromDate, toDate);
     }
 
     @GetMapping("/refresh")

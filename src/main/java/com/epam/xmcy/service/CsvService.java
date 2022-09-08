@@ -28,10 +28,11 @@ public interface CsvService {
     /**
      * Gets all cryptocurrencies sorted by normalized range for a particular day.
      *
-     * @param date date.
+     * @param fromDate start date.
+     * @param toDate end date.
      * @return list of cryptocurrencies.
      */
-    List<Cryptocurrency> getRecommendationByDate(LocalDate date);
+    List<Cryptocurrency> getRecommendationByDate(LocalDate fromDate, LocalDate toDate);
 
     /**
      * Recalculates all crypto stats based on CSV files.

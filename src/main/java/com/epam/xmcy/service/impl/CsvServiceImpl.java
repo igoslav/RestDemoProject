@@ -64,12 +64,17 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public List<Cryptocurrency> getRecommendationByDate(LocalDate date) {
+    public List<Cryptocurrency> getRecommendationByDate(LocalDate fromDate, LocalDate toDate) {
         try {
             Map<LocalDate, List<Cryptocurrency>> statsForDays = FileUtils.readJson(normalizedInfoFileName,
                     new TypeReference<>() {});
 
-            return statsForDays.getOrDefault(date, null);
+            // Now we recommend crypto by single day.
+            // In case we want to recommend crypto by range:
+            // 1. Grab all data from statsForDays from fromDate to toDate.
+            // 2. Calculate normalized range for every cryptocurrency.
+            // 3. Collect as list and return.
+            return statsForDays.getOrDefault(fromDate, null);
         } catch (IOException e) {
             log.error("Failed to read JSON from file " + normalizedInfoFileName + e.getMessage());
             return null;
