@@ -14,7 +14,11 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,15 +27,15 @@ import java.util.stream.Stream;
  * Class reads CSV files from directory, converts to {@link CryptoValue}
  * and returns as Map<String, List<CryptoValue>>.
  */
-@Component
+@Component("csvCryptoDataStrategy")
 @Slf4j
 public class CSVCryptoDataStrategy implements CryptoDataStrategy {
 
     /**
      * Path to directory with CSV files.
      */
-    @Value("${xmcy.data.pathToCsvDir}")
-    private String pathToCsvDir = "C:/Users/Yahor_Litvinchuk/Desktop/prices/";
+    @Value("${path.to.csv.dir}")
+    private String pathToCsvDir;
 
     /**
      * Defines in which order values should be read.
@@ -159,9 +163,5 @@ public class CSVCryptoDataStrategy implements CryptoDataStrategy {
                     .map(Path::toString)
                     .collect(Collectors.toList());
         }
-    }
-
-    public void setPathToCsvDir(String pathToCsvDir) {
-        this.pathToCsvDir = pathToCsvDir;
     }
 }

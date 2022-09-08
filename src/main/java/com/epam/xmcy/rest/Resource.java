@@ -5,7 +5,11 @@ import com.epam.xmcy.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,17 +39,18 @@ public class Resource {
     /**
      * Method returns statistics for a particular cryptocurrency within range.
      *
-     * @param crypto cryptocurrency short name (BTC, ETH, etc.).
-     * @param fromDate start date for crypto stats, format dd-MM-yyyy.
-     * @param toDate end date for crypto stats, format dd-MM-yyyy.
-     *
+     * @param crypto   cryptocurrency short name (BTC, ETH, etc.).
+     * @param fromDate start date for crypto stats, optional, format dd-MM-yyyy.
+     * @param toDate   end date for crypto stats, optional, format dd-MM-yyyy.
      * @return cryptocurrency statistic object.
      */
     @GetMapping("/{crypto}")
     @ResponseBody
     public Cryptocurrency getCryptoStatistics(@PathVariable String crypto,
-                                      @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fromDate,
-                                      @RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate toDate) {
+                                              @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fromDate,
+                                              @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate toDate) {
         if (crypto == null || "".equals(crypto)) {
             throw new IllegalArgumentException("Please provide valid cryptocurrency short name.");
         }
@@ -65,16 +70,24 @@ public class Resource {
      * Method returns cryptocurrency with the highest normalized range for a specific date.
      *
      * @param date date to check, format dd-MM-yyyy.
-     *
      * @return cryptocurrency object.
      */
     @GetMapping("/recommendation")
     @ResponseBody
-    public List<Cryptocurrency> getRecommendationByDate(@RequestParam @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
+    public List<Cryptocurrency> getRecommendationByDate(@RequestParam(required = false)
+                                                @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
         if (date == null) {
-            throw new IllegalArgumentException("Please provide date");
+            date = LocalDate.now();
         }
 
+        // Actually, we need to return only 1 crypto,
+        // but this endpoint returns list of all cryptos sorted by normalized range
         return csvService.getRecommendationByDate(date);
+    }
+
+    @GetMapping("/refresh")
+    @ResponseBody
+    public void refreshStats() {
+        csvService.refreshData();
     }
 }

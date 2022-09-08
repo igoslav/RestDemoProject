@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 /**
  * Util class to work with files.
@@ -33,9 +37,8 @@ public final class FileUtils {
      */
     public static void saveAsJson(Object object, String fileName) throws IOException {
         Path path = Paths.get(fileName);
-        if (!Files.exists(path)) {
-            Files.createFile(path);
-        }
+        Files.deleteIfExists(path);
+        Files.createFile(path);
 
         String json = objectMapper.writeValueAsString(object);
 

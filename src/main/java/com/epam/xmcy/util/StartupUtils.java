@@ -6,12 +6,18 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Class to run specific jobs at the start of the application.
+ */
 @Component
 public class StartupUtils {
 
     @Autowired
     private CsvService csvService;
 
+    /**
+     * Calculate crypto data at startup.
+     */
     @PostConstruct
     public void processDataOnStartup() {
         csvService.refreshData();
